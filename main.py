@@ -3,6 +3,7 @@ Usage: python main.py grammar.txt string
 """
 import sys
 from itertools import product
+from collections import defaultdict
 import pdb
 
 def print_and_exit():
@@ -33,11 +34,12 @@ with open(sys.argv[1], "r") as r:
 
 table = []
 for i in range(N):
-    table.append( [None for _ in range(i)] + [set() for _ in range(i,N)] )
+    table.append( [None for _ in range(i)] + [defaultdict(list) for _ in range(i,N)] )
+    #table.append( [None for _ in range(i)] + [set() for _ in range(i,N)] )
 
 for (i, c) in enumerate(w):
     for (left, right) in atomic_rules:
-        if c == right: table[i][i].add(left)
+        if c == right: table[i][i][left].append(i)
 
 diag = 1
 while diag < N:
@@ -47,7 +49,8 @@ while diag < N:
         for k in range(i, j):
             for (cand_l, cand_r) in product(table[i][k], table[k+1][j]):
                 for (left, right) in composite_rules:
-                    if (cand_l, cand_r) == right: table[i][j].add(left)
+                    #if (cand_l, cand_r) == right: table[i][j].add(left)
+                    if (cand_l, cand_r) == right: table[i][j][left].append(k)
         i += 1
         j += 1
     diag += 1
